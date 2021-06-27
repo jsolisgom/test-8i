@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Course;
 use Illuminate\Support\Facades\Auth;
 
+use App\Jobs\SendEmail;
+
 class CourseController extends Controller
 {
     public function index(){
@@ -25,7 +27,9 @@ class CourseController extends Controller
     public function store(Request $request){
         $user = Auth::user();
         $courseId = $request->id;
+        $course = Course::find($courseId);
         $user->courses()->attach($courseId);
+        SendEmail::dispatch($user, $course);
 
         return redirect()->back()->with('success', 'Curso comprado correctamente');
     }
